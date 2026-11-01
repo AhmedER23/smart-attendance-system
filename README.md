@@ -52,7 +52,7 @@
 ## 📁 Proje Dizin Yapısı
 
 ```
-yuz-tanima-destekli-akilli-yoklama-sistemi/
+smart-attendance-system/
 ├── app/
 │   ├── __init__.py          # Uygulama fabrikası (create_app) & hata yakalayıcılar
 │   ├── config.py            # Ortam değişkenleri ve yapılandırma sınıfları
@@ -83,8 +83,8 @@ yuz-tanima-destekli-akilli-yoklama-sistemi/
 
 ### 1. Depoyu Klonlayın
 ```bash
-git clone https://github.com/<kullanici-adiniz>/yuz-tanima-destekli-akilli-yoklama-sistemi.git
-cd yuz-tanima-destekli-akilli-yoklama-sistemi
+git clone https://github.com/AhmedER23/smart-attendance-system.git
+cd smart-attendance-system
 ```
 
 ### 2. Sanal Ortamı Oluşturun ve Aktif Edin
