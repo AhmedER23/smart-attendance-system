@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Öğrenciler{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Öğrenciler</h1>
+    <p>Yüz verisi kayıtlı tüm öğrenciler.</p>
+  </div>
+  <a class="btn" href="{{ url_for('students.new') }}">Öğrenci kaydet</a>
+</div>
+
+<form method="get" class="form-row" style="margin-bottom:20px">
+  <label class="sr-only" for="q">Ara</label>
+  <input id="q" name="q" type="search" value="{{ query }}" placeholder="Ad, soyad veya okul numarası">
+  <button class="btn btn-secondary" type="submit">Ara</button>
+</form>
+
+{% if students %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Okul no</th><th>Ad soyad</th><th>Yüz verisi</th><th class="num">Ders</th><th></th></tr></thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>{{ s.school_number }}</td>
+        <td>{{ s.full_name }}</td>
+        <td>{% if s.face_embedding %}<span class="badge badge-present">Kayıtlı</span>{% else %}<span class="badge badge-pending">Yok</span>{% endif %}</td>
+        <td class="num">{{ s.courses|length }}</td>
+        <td class="actions-cell">
+          <form class="inline" method="post" action="{{ url_for('students.delete', student_id=s.id) }}"
+                onsubmit='return confirm({{ (s.full_name ~ " ve yüz verisi silinecek. Emin misiniz?")|tojson }})'>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-small btn-danger" type="submit">Sil</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif query %}
+<div class="empty"><strong>Sonuç bulunamadı</strong>“{{ query }}” için eşleşen öğrenci yok.</div>
+{% else %}
+<div class="empty">
+  <strong>Henüz öğrenci kaydı yok</strong>
+  Kamera ile ilk öğrencinin yüzünü kaydedin.
+  <div><a class="btn" href="{{ url_for('students.new') }}">Öğrenci kaydet</a></div>
+</div>
+{% endif %}
+{% endblock %}

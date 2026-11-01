@@ -1,0 +1,19 @@
+# Web
+Flask==3.1.2
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.2
+SQLAlchemy==2.0.44
+Werkzeug==3.1.4
+python-dotenv==1.1.1
+gunicorn==23.0.0
+
+# Veritabanı sürücüsü (MySQL kullanmıyorsanız kaldırabilirsiniz)
+PyMySQL==1.1.2
+
+# Yüz tanıma
+deepface==0.0.96
+tensorflow==2.20.0
+tf-keras==2.20.1
+opencv-python==4.12.0.88
+numpy==2.2.6

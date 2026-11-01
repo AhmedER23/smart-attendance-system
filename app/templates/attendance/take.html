@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Yoklama · {{ course.name }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('courses.dashboard') }}">← Derslere dön</a>
+<div class="page-header">
+  <div>
+    <h1>{{ course.name }}</h1>
+    <p>{{ today|tr_date }} yoklaması. Öğrenciler sırayla kameraya baksın; tanınanlar listede işaretlenir.</p>
+  </div>
+</div>
+
+{% if not students %}
+<div class="empty">
+  <strong>Bu derse kayıtlı öğrenci yok</strong>
+  Yoklama alabilmek için önce öğrencileri derse ekleyin.
+  <div><a class="btn" href="{{ url_for('courses.detail', course_id=course.id) }}">Öğrenci ekle</a></div>
+</div>
+{% else %}
+<div class="scanner" id="scanner" data-course-id="{{ course.id }}" data-url="{{ url_for('api.recognize') }}">
+  <div>
+    <div class="viewport" id="viewport">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="viewport-idle"><span>Kamera kapalı.<br>Başlamak için “Yoklamayı başlat”a basın.</span></div>
+    </div>
+    <div class="statusbar is-info" id="status" role="status" aria-live="polite">Hazır.</div>
+    <div class="actions scanner-actions">
+      <button class="btn" type="button" id="start-btn">Yoklamayı başlat</button>
+      <button class="btn btn-secondary" type="button" id="flip-btn" style="display:none">Kamerayı çevir</button>
+      <button class="btn btn-secondary" type="button" id="stop-btn" disabled>Durdur</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="roster-head">
+      <h2>Katılım</h2>
+      <div class="roster-count"><span id="present-count">{{ marked|length }}</span><small> / {{ students|length }}</small></div>
+    </div>
+    <ul class="roster" id="roster">
+      {% for s in students %}
+      <li data-student-id="{{ s.id }}" class="{{ 'present' if s.id in marked }}">
+        <span class="tick" aria-hidden="true">✓</span>
+        <div class="who"><strong>{{ s.full_name }}</strong><span>{{ s.school_number }}</span></div>
+        <span class="when">{% if s.id in marked %}{{ marked[s.id].strftime('%H:%M') }}{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if students %}
+<script src="{{ url_for('static', filename='js/camera.js', v='7') }}"></script>
+<script src="{{ url_for('static', filename='js/attendance.js', v='7') }}"></script>
+{% endif %}
+{% endblock %}

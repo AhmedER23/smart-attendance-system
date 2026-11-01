@@ -1,0 +1,9 @@
+{% macro brand() %}
+  <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+    <rect width="24" height="24" rx="6" fill="#0e7c86"/>
+    <path d="M7 12.5l3.2 3.2L17 8.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span>Yoklama</span>
+{% endmacro %}
+
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}

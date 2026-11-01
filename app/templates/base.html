@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}{% endblock %} · Yoklama</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230e7c86'/%3E%3Cpath d='M7 12.5l3.2 3.2L17 8.8' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='7') }}">
+</head>
+{% from "_macros.html" import brand %}
+<body>
+{% block shell %}
+  {% if current_user.is_authenticated %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{{ url_for('courses.dashboard') }}">{{ brand() }}</a>
+      <nav class="nav" aria-label="Ana menü">
+        <a href="{{ url_for('courses.dashboard') }}" {% if request.endpoint and request.endpoint.startswith('courses.') %}aria-current="page"{% endif %}>Dersler</a>
+        <a href="{{ url_for('students.list_students') }}" {% if request.endpoint and request.endpoint.startswith('students.') %}aria-current="page"{% endif %}>Öğrenciler</a>
+        <a href="{{ url_for('attendance.reports') }}" {% if request.endpoint == 'attendance.reports' %}aria-current="page"{% endif %}>Raporlar</a>
+      </nav>
+      <div class="user-box">
+        <span class="who-name">{{ current_user.full_name }} Hocam</span>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="link-button" type="submit">Çıkış yap</button>
+        </form>
+      </div>
+    </div>
+  </header>
+  {% endif %}
+
+  <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flashes" role="status">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

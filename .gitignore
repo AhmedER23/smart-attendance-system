@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Ortam ve gizli bilgiler
+.env
+
+# Yerel veri ve SSL sertifikaları
+instance/
+*.db
+*.sqlite3
+*.pem
+cert.pem
+key.pem
+scratch/
+
+# DeepFace model önbelleği
+.deepface/
+.keras/
+
+# Editör / işletim sistemi
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

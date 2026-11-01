@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Öğrenci kaydet{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('courses.detail', course_id=preselected_course_id) if preselected_course_id else url_for('students.list_students') }}">← {{ 'Derse dön' if preselected_course_id else 'Öğrencilere dön' }}</a>
+<div class="page-header">
+  <div>
+    <h1>Öğrenci kaydet</h1>
+    <p>Bilgileri girin, kamerayı açın ve yüzün net göründüğü anda kaydedin.</p>
+  </div>
+</div>
+
+<div class="register-layout" id="register" data-url="{{ url_for('api.create_student') }}">
+  <form id="student-form" novalidate>
+    <div class="field">
+      <label for="school_number">Okul numarası</label>
+      <input id="school_number" name="school_number" type="text" maxlength="50" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="name">Ad</label>
+      <input id="name" name="name" type="text" maxlength="100" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="surname">Soyad</label>
+      <input id="surname" name="surname" type="text" maxlength="100" required autocomplete="off">
+    </div>
+    {% if courses %}
+    <fieldset>
+      <legend>Derslere ekle</legend>
+      {% for c in courses %}
+      <label class="check">
+        <input type="checkbox" name="course_ids" value="{{ c.id }}" {% if preselected_course_id == c.id %}checked{% endif %}>
+        {{ c.name }}
+      </label>
+      {% endfor %}
+    </fieldset>
+    {% endif %}
+    <p class="muted" style="font-size:.85rem;margin-bottom:16px">
+      Yüz verisi biyometrik kişisel veridir. Öğrenciden (veya velisinden) açık rıza aldığınızdan emin olun.
+    </p>
+  </form>
+
+  <div>
+    <div class="viewport" id="viewport">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="viewport-idle"><span>Kamera kapalı.<br>Başlamak için “Kamerayı aç”a basın.</span></div>
+    </div>
+    <div class="statusbar is-info" id="status" role="status" aria-live="polite">Kamera bekleniyor.</div>
+    <div class="actions scanner-actions">
+      <button class="btn btn-secondary" type="button" id="camera-btn">Kamerayı aç</button>
+      <button class="btn btn-secondary" type="button" id="flip-btn" style="display:none">Kamerayı çevir</button>
+      <button class="btn" type="button" id="save-btn" disabled>Yüzü kaydet</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera.js', v='7') }}"></script>
+<script src="{{ url_for('static', filename='js/register.js', v='7') }}"></script>
+{% endblock %}

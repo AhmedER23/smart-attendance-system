@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dersler{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Merhaba, {{ current_user.name.title() }} Hocam</h1>
+    <p>Bir ders seçip yoklamayı başlatın veya yeni ders ekleyin.</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-secondary" href="{{ url_for('students.new') }}">Öğrenci kaydet</a>
+  </div>
+</div>
+
+<section>
+  <div class="section-head"><h2>Derslerim</h2><span class="muted">{{ courses|length }} ders</span></div>
+  {% if courses %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Ders</th><th class="num">Kayıtlı öğrenci</th><th class="num">Bugün katılan</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        <tr>
+          <td><a class="row-link" href="{{ url_for('courses.detail', course_id=course.id) }}">{{ course.name }}</a></td>
+          <td class="num">{{ course.students|length }}</td>
+          <td class="num">{{ present_today.get(course.id, 0) }}</td>
+          <td class="actions-cell">
+            <a class="btn btn-small" href="{{ url_for('attendance.take', course_id=course.id) }}">Yoklama al</a>
+            <a class="btn btn-small btn-secondary" href="{{ url_for('attendance.reports', course_id=course.id) }}">Rapor</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <strong>Henüz dersiniz yok</strong>
+    Aşağıdaki formdan ilk dersinizi ekleyin.
+  </div>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>Yeni ders ekle</h2></div>
+  <form method="post" class="form-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="sr-only" for="course_name">Ders adı</label>
+    <input id="course_name" name="course_name" type="text" placeholder="Ders adı, örn. Yapay Zeka" maxlength="100" required>
+    <button class="btn" type="submit">Dersi ekle</button>
+  </form>
+</section>
+{% endblock %}

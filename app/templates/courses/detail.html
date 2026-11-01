@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('courses.dashboard') }}">← Derslere dön</a>
+<div class="page-header">
+  <div>
+    <h1>{{ course.name }}</h1>
+    <p>{{ enrolled|length }} kayıtlı öğrenci</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('attendance.take', course_id=course.id) }}">Yoklama al</a>
+    <a class="btn btn-secondary" href="{{ url_for('attendance.reports', course_id=course.id) }}">Raporlar</a>
+  </div>
+</div>
+
+<section>
+  <div class="section-head"><h2>Derse kayıtlı öğrenciler</h2></div>
+  {% if enrolled %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Okul no</th><th>Ad soyad</th><th></th></tr></thead>
+      <tbody>
+        {% for s in enrolled %}
+        <tr>
+          <td>{{ s.school_number }}</td>
+          <td>{{ s.full_name }}</td>
+          <td class="actions-cell">
+            <form class="inline" method="post" action="{{ url_for('courses.unenroll', course_id=course.id, student_id=s.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-small btn-secondary" type="submit">Dersten çıkar</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <strong>Bu derse kayıtlı öğrenci yok</strong>
+    Yoklama alabilmek için önce öğrencileri derse ekleyin.
+  </div>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Derse öğrenci ekle</h2>
+    <a class="btn btn-secondary btn-small" href="{{ url_for('students.new', course_id=course.id) }}">+ Yeni Öğrenci Kaydet ve Derse Ekle</a>
+  </div>
+  {% if available %}
+  <div class="panel" style="margin-bottom:16px">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px">
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+        <form method="post" action="{{ url_for('courses.enroll', course_id=course.id) }}" style="margin:0">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="enroll_all" value="1">
+          <button class="btn btn-secondary" type="submit" title="Bekleyen tüm öğrencileri tek tıkla bu derse ekler">
+            Hepsini ekle ({{ available|length }} öğrenci)
+          </button>
+        </form>
+      </div>
+      <div style="min-width:220px">
+        <input type="search" id="filter-available" placeholder="Öğrencilerde ara..." style="padding:7px 10px; font-size:0.9rem">
+      </div>
+    </div>
+
+    <form method="post" action="{{ url_for('courses.enroll', course_id=course.id) }}" id="bulk-enroll-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px">
+        <label class="check" style="font-weight:600; cursor:pointer">
+          <input type="checkbox" id="select-all-available">
+          <span>Tümünü seç / kaldır</span>
+        </label>
+        <button class="btn" type="submit" id="submit-selected-btn">
+          Seçilenleri derse ekle (<span id="selected-count">0</span>)
+        </button>
+      </div>
+
+      <div class="table-wrap" style="max-height:360px; overflow-y:auto">
+        <table id="available-table">
+          <thead>
+            <tr>
+              <th style="width:40px"></th>
+              <th>Okul no</th>
+              <th>Ad soyad</th>
+              <th style="text-align:right">Hızlı işlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in available %}
+            <tr class="available-row" data-text="{{ s.school_number|lower }} {{ s.full_name|lower }}">
+              <td>
+                <input type="checkbox" name="student_ids" value="{{ s.id }}" class="student-checkbox">
+              </td>
+              <td><strong>{{ s.school_number }}</strong></td>
+              <td>{{ s.full_name }}</td>
+              <td class="actions-cell">
+                <button type="submit" name="student_id" value="{{ s.id }}" class="btn btn-small btn-secondary" style="padding:4px 10px">
+                  + Ekle
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+  {% else %}
+  <div class="empty" style="padding:28px 20px">
+    <strong>Bu derse eklenebilecek bekleyen öğrenci yok</strong>
+    <p class="muted" style="margin:6px 0 16px">Sistemdeki tüm kayıtlı öğrenciler bu derse eklenmiş durumda.</p>
+    <a class="btn" href="{{ url_for('students.new', course_id=course.id) }}">+ Yeni Öğrenci Kaydet ve Bu Derse Ekle</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-head"><h2>Dersi sil</h2></div>
+  <p class="muted" style="margin-bottom:12px">Ders ve bu derse ait tüm yoklama kayıtları kalıcı olarak silinir. Öğrenciler silinmez.</p>
+  <form method="post" action="{{ url_for('courses.delete', course_id=course.id) }}"
+        onsubmit='return confirm({{ ("“" ~ course.name ~ "” dersi ve tüm yoklama kayıtları silinecek. Emin misiniz?")|tojson }})'>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-danger" type="submit">Dersi sil</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const selectAll = document.getElementById("select-all-available");
+    const checkboxes = document.querySelectorAll(".student-checkbox");
+    const countEl = document.getElementById("selected-count");
+    const searchInput = document.getElementById("filter-available");
+    const rows = document.querySelectorAll(".available-row");
+
+    function updateCount() {
+      if (!countEl) return;
+      const checked = document.querySelectorAll(".student-checkbox:checked").length;
+      countEl.textContent = checked;
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener("change", function () {
+        checkboxes.forEach((cb) => {
+          const row = cb.closest("tr");
+          if (!row || row.style.display !== "none") {
+            cb.checked = selectAll.checked;
+          }
+        });
+        updateCount();
+      });
+    }
+
+    checkboxes.forEach((cb) => cb.addEventListener("change", updateCount));
+
+    if (searchInput) {
+      searchInput.addEventListener("input", function () {
+        const query = this.value.trim().toLowerCase();
+        rows.forEach((row) => {
+          const text = row.dataset.text || "";
+          row.style.display = text.includes(query) ? "" : "none";
+        });
+      });
+    }
+  })();
+</script>
+{% endblock %}

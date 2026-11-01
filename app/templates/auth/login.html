@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import brand %}
+{% block title %}Giriş{% endblock %}
+{% block shell %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a class="brand" href="{{ url_for('auth.login') }}">{{ brand() }}</a>
+    <h1>Giriş yap</h1>
+    <p>Derslerinizi yönetmek ve yoklama almak için hesabınızla devam edin.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" style="margin-bottom:16px">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input id="email" name="email" type="email" autocomplete="email" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Parola</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <label class="check"><input type="checkbox" name="remember"> Bu cihazda oturumu açık tut</label>
+      <button class="btn" type="submit" style="margin-top:16px">Giriş yap</button>
+    </form>
+
+    {% if config['ALLOW_TEACHER_REGISTRATION'] %}
+    <p class="auth-foot">Hesabınız yok mu? <a href="{{ url_for('auth.register') }}">Hesap oluşturun</a></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

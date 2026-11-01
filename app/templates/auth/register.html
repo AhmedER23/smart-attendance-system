@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import brand %}
+{% block title %}Hesap oluştur{% endblock %}
+{% block shell %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a class="brand" href="{{ url_for('auth.login') }}">{{ brand() }}</a>
+    <h1>Hesap oluştur</h1>
+    <p>Öğretmen hesabınızla ders açıp öğrencilerinizin yoklamasını alın.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" style="margin-bottom:16px">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="name">Ad</label>
+        <input id="name" name="name" type="text" value="{{ form.name }}" autocomplete="given-name" required autofocus>
+      </div>
+      <div class="field">
+        <label for="surname">Soyad</label>
+        <input id="surname" name="surname" type="text" value="{{ form.surname }}" autocomplete="family-name" required>
+      </div>
+      <div class="field">
+        <label for="email">E-posta</label>
+        <input id="email" name="email" type="email" value="{{ form.email }}" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="password">Parola</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8">
+        <span class="hint">En az 8 karakter.</span>
+      </div>
+      <div class="field">
+        <label for="confirm">Parola (tekrar)</label>
+        <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+      </div>
+      <button class="btn" type="submit">Hesap oluştur</button>
+    </form>
+    <p class="auth-foot">Zaten hesabınız var mı? <a href="{{ url_for('auth.login') }}">Giriş yapın</a></p>
+  </div>
+</div>
+{% endblock %}
